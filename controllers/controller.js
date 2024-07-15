@@ -23,6 +23,9 @@ const controller = (req, res) => {
     case 'led': 
       setLights(req, res)
       break
+    case 'mp3': 
+      playMP3(req, res) 
+      break
     default:
       console.log('component is not found')
       res.status(400).json({error: 'component is not found'})
@@ -34,7 +37,7 @@ const openDoor = (req, res) => {
     var servo;
     boardReady({board: 'Smart', device: 'P4eMd', transport: 'mqtt'}, function (board) {
       board.samplingInterval = 50;
-      servo = getServo(board, 13);
+      servo = getServo(board, 16);
       servo.angle = 175;
     });
     res.status(200).json({message:'Door is opened'})
@@ -51,7 +54,7 @@ const closeDoor = (req, res) => {
     var servo;
     boardReady({board: 'Smart', device: 'P4eMd', transport: 'mqtt'}, function (board) {
       board.samplingInterval = 50;
-      servo = getServo(board, 13);
+      servo = getServo(board, 16);
       servo.angle = 90;
     });
     res.status(200).json({message:'Door is closed'})
@@ -142,6 +145,51 @@ const setLights = (req, res) => {
   } else {
     res.status(400).json({error:'brightness is raised'})
   }
+}
+
+const playMP3 = (req, res) => {
+  var dfplayer
+  boardReady({board: 'Smart', device: 'P4eMd', transport: 'mqtt'}, function (board) {
+    board.samplingInterval = 50;
+    dfplayer = getDFPlayer(board,13,12);
+    dfplayer.volume(30);
+    dfplayer.play(1)
+    // const startPlay = function () {
+    //   dfplayer.stop()
+    //   dfplayer.play(1)
+    //   res.status(200).json({message:'music is played'})
+    // }
+    // startPlay()
+    // await dfplayer.stop();
+    // res.status(200).json({message:'music is played'})
+    // return
+  });
+}
+
+function buzzer_music(m) {
+  var musicNotes = {};
+  musicNotes.notes = [];
+  musicNotes.tempos = [];
+  if (m[0].notes.length > 1) {
+    for (var i = 0; i < m.length; i++) {
+      if (Array.isArray(m[i].notes)) {
+        var cn = musicNotes.notes.concat(m[i].notes);
+        musicNotes.notes = cn;
+      } else {
+        musicNotes.notes.push(m[i].notes);
+      }
+      if (Array.isArray(m[i].tempos)) {
+        var ct = musicNotes.tempos.concat(m[i].tempos);
+        musicNotes.tempos = ct;
+      } else {
+        musicNotes.tempos.push(m[i].tempos);
+      }
+    }
+  } else {
+    musicNotes.notes = [m[0].notes];
+    musicNotes.tempos = [m[0].tempos];
+  }
+  return musicNotes;
 }
 
 module.exports = { controller }
