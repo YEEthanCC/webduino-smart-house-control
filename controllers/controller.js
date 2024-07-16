@@ -1,35 +1,87 @@
+const compression = require('compression');
+
 global.webduino = require('webduino-js');
 require('../webduino-blockly')(global);
 
 const controller = (req, res) => {
   console.log(req.body)
-  switch (req.body.component) {
-    case 'door':
-      switch (req.body.operation) {
-        case 'open':
-          openDoor(req, res) 
-          break
-        case 'close': 
-          closeDoor(req, res)
-          break
-      }
-      break
-    case 'lcd':
-      displayText(req, res)
-      break;
-    case 'led matrix': 
-      displayMatrix(req, res)
-      break
-    case 'led': 
-      setLights(req, res)
-      break
-    case 'mp3': 
-      playMP3(req, res) 
-      break
-    default:
-      console.log('component is not found')
-      res.status(400).json({error: 'component is not found'})
-  }
+  component = req.body.component
+  if(component === 'door') {
+    switch (req.body.operation) {
+      case 'open':
+        openDoor(req, res) 
+        break
+      case 'close': 
+        closeDoor(req, res)
+        break
+    }
+  } else if(component === 'lcd') {
+    displayText(req, res)
+  } else if(component === 'led matrix') {
+    displayMatrix(req, res)
+  } else if(component === 'led') {
+    setLights(req, res)
+  } else if(component === 'mp3') {
+    (async function () {
+
+      var dfplayer;
+      
+      
+      boardReady({board: 'Smart', device: 'P4eMd', transport: 'mqtt'}, async function (board) {
+        board.samplingInterval = 50;
+        dfplayer = await getDFPlayer(board,12,13);
+        await dfplayer.volume(30);
+        await delay(2);
+        // await dfplayer.stop();
+        await dfplayer.play(1);
+      });
+      
+    }());
+} else {
+  console.log('component is not found')
+  res.status(400).json({error: 'component is not found'})
+}
+  // switch (req.body.component) {
+  //   case 'door':
+  //     switch (req.body.operation) {
+  //       case 'open':
+  //         openDoor(req, res) 
+  //         break
+  //       case 'close': 
+  //         closeDoor(req, res)
+  //         break
+  //     }
+  //     break
+  //   case 'lcd':
+  //     displayText(req, res)
+  //     break;
+  //   case 'led matrix': 
+  //     displayMatrix(req, res)
+  //     break
+  //   case 'led': 
+  //     setLights(req, res)
+  //     break
+  //   case 'mp3': 
+  //     (async function () {
+
+  //       var dfplayer;
+        
+        
+  //       boardReady({board: 'Smart', device: 'P4eMd', transport: 'mqtt'}, async function (board) {
+  //         board.samplingInterval = 50;
+  //         dfplayer = await getDFPlayer(board,12,13);
+  //         await dfplayer.volume(30);
+  //         await delay(2);
+  //         await dfplayer.stop();
+  //         await dfplayer.play(1);
+  //       });
+        
+  //     }());
+  //     // break
+  //   default:
+  //     console.log('component is not found')
+  //     res.status(400).json({error: 'component is not found'})
+  // }
 }
 
 const openDoor = (req, res) => {
@@ -147,23 +199,18 @@ const setLights = (req, res) => {
   }
 }
 
-const playMP3 = (req, res) => {
-  var dfplayer
-  boardReady({board: 'Smart', device: 'P4eMd', transport: 'mqtt'}, function (board) {
+const playMP3 = async (req, res) => {
+
+  var dfplayer;
+
+  boardReady({ board: 'Smart', device: 'P4eMd', transport: 'mqtt' }, async (board) => {
     board.samplingInterval = 50;
-    dfplayer = getDFPlayer(board,13,12);
+    dfplayer = getDFPlayer(board, 12, 13);
     dfplayer.volume(30);
-    dfplayer.play(1)
-    // const startPlay = function () {
-    //   dfplayer.stop()
-    //   dfplayer.play(1)
-    //   res.status(200).json({message:'music is played'})
-    // }
-    // startPlay()
-    // await dfplayer.stop();
-    // res.status(200).json({message:'music is played'})
-    // return
+    await delay(2);
+    dfplayer.play(1);
   });
+
 }
 
 function buzzer_music(m) {

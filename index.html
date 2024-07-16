@@ -4,15 +4,6 @@
   <title>Webduino</title>
 </head>
 <body>
-  <script src="//webduino.io/components/webduino-js/dist/webduino-all.min.js"></script>
-  <script src="webduino-blockly.js"></script>
-  <script>
-var servo;
-    boardReady({board: 'Smart', device: 'P4eMd', transport: 'mqtt'}, function (board) {
-      board.samplingInterval = 50;
-      servo = getServo(board, 13);
-      servo.angle = 175;
-    });
-  </script>
+
 </body>
 </html>

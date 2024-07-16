@@ -24,12 +24,3 @@ app.use('/api', route)
 app.listen(process.env.PORT, () => {
     console.log('Listening on port', process.env.PORT)
 })
-
-
-// const worker = new Worker('./workers/irReceiver.js')
-
-// worker.on('message', (message) => {
-//     if(message.type === 'irData') {
-//         console.log('Received IR data from worker:', message.data)
-//     }
-// })
