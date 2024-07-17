@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+   name: webduino-smart-house-service
+   namespace: ethan
+spec:
+  selector: 
+    app: webduino-smart-house
+  type: LoadBalancer
+  ports:
+  - protocol: TCP 
+    port: 5000
+    targetPort: 3000
+    nodePort: 31110

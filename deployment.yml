@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: webduino-smart-house-deployment
+   namespace: ethan
+   labels: 
+    app: webduino-smart-house
+spec:
+   replicas: 1
+   selector:
+      matchLabels: 
+         app: webduino-smart-house
+   template:
+      metadata:
+         labels:
+            app: webduino-smart-house
+      spec:
+         containers:
+            - name: webduino-smart-house-server
+              image: e3ancc/webduino-smart-house:latest
+              ports: 
+                - containerPort: 3000
