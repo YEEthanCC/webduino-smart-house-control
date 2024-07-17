@@ -106,7 +106,8 @@ const setLights = (req, res, led) => {
 
 const playMP3 = async (req, res, dfplayer) => {
   await delay(2);
-  dfplayer.play(1);
+  dfplayer.play(req.body.playlist);
+  res.status(200).json({message:'music is played'})
 }
 
 module.exports = { createController }
