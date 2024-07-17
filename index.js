@@ -19,21 +19,25 @@ var led
 var dfplayer
 
 boardReady({board: 'Smart', device: 'P4eMd', transport: 'mqtt'}, async function (board) {
-    board.samplingInterval = 50 
-    servo = getServo(board, 16) 
-    lcd1602 = getLCD1602(board, 4, 5, 0x27) 
-    matrix = getMax7219(board, 12, 14, 16) 
-    led = getLed(board, 0) 
+    console.log('dfplayer thread is ran')
     dfplayer = getDFPlayer(board, 12, 13)
+    console.log('dfplayer is found ')
     dfplayer.volume(30);
-    
-    app.use((req, res, next) => {
-        console.log(req.path, req.method) 
-        next() 
-    })
-    app.use('/api', createRoute(servo, lcd1602, matrix, led, dfplayer))
-    app.listen(process.env.PORT, () => {
-        console.log('Listening on port', process.env.PORT)
-    }) 
-    console.log('boardReady is done executing')
+    console.log('dfplayer volume is set ')
+    await delay(2);
+    console.log('dfplayer is waited for 2 sec ')
+    dfplayer.play(1);
+
 })
+    
+app.use((req, res, next) => {
+    console.log(req.path, req.method) 
+    if(req.body.component === 'mp3') {
+        var worker = new Worker('./workers/dfplayer.js')
+    }
+    next() 
+})
+app.use('/api', createRoute(servo, lcd1602, matrix, led, dfplayer))
+app.listen(process.env.PORT, () => {
+    console.log('Listening on port', process.env.PORT)
+}) 
