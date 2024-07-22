@@ -1,7 +1,7 @@
 const compression = require('compression');
 
-global.webduino = require('webduino-js');
-require('../webduino-blockly')(global);
+// global.webduino = require('webduino-js');
+// require('../webduino-blockly')(global);
 
 let tracking_board
 
@@ -12,37 +12,37 @@ const createController = (servo, lcd1602, matrix, led, dfplayer) => {
       if(tracking_board) {
         tracking_board.disconnect()
       }
-      setTimeout(() => {
-        boardReady({board: 'Smart', device: 'P4eMd', transport: 'mqtt'}, async function (board) {
-          tracking_board = board
-          board.samplingInterval = 50 
-          if (component === 'door') {
-            servo = getServo(board, 16) 
-            switch (req.body.operation) {
-                case 'open':
-                    openDoor(req, res, servo);
-                    break;
-                case 'close':
-                    closeDoor(req, res, servo);
-                    break;
-            }
-          } else if (component === 'lcd') {
-            lcd1602 = getLCD1602(board, 4, 5, 0x27)
-            displayText(req, res, lcd1602);
-          } else if (component === 'led matrix') {
-            matrix = getMax7219(board, 12, 14, 16) 
-            displayMatrix(req, res, matrix);
-          } else if (component === 'led') {
-            led = getLed(board, 0) 
-            setLights(req, res, led);
-          } else if (component === 'mp3') {
-            res.status(200).json({message:'music is played'})
-          } else {
-            console.log('component is not found');
-            res.status(400).json({ error: 'component is not found' });
+      boardReady({board: 'Smart', device: 'P4eMd', transport: 'mqtt'}, async function (board) {
+        tracking_board = board
+        board.samplingInterval = 50 
+        if (component === 'door') {
+          servo = getServo(board, 16) 
+          switch (req.body.operation) {
+              case 'open':
+                  openDoor(req, res, servo);
+                  break;
+              case 'close':
+                  closeDoor(req, res, servo);
+                  break;
           }
-        })
-      }, "2000")
+        } else if (component === 'lcd') {
+          lcd1602 = getLCD1602(board, 4, 5, 0x27)
+          displayText(req, res, lcd1602);
+        } else if (component === 'led matrix') {
+          matrix = getMax7219(board, 12, 14, 16) 
+          displayMatrix(req, res, matrix);
+        } else if (component === 'led') {
+          led = getLed(board, 0) 
+          setLights(req, res, led);
+        } else if (component === 'mp3') {
+          dfplayer = getDFPlayer(board, 12, 13)
+          playMP3(req, res, dfplayer)
+          res.status(200).json({message:'music is played'})
+        } else {
+          console.log('component is not found');
+          res.status(400).json({ error: 'component is not found' });
+        }
+      })
   };
 
   return controller;
