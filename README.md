@@ -1,3 +1,8 @@
+# Install Dependencies
+```
+npm install 
+```
+
 # Start The Server
 ```
 npm run dev
